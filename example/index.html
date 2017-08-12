@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>测试AOP</title>
+        <meta charset="UTF-8">
+        <script src="../jquery-3.2.1.js"></script>
+        <script src="../funAop.js"></script>
+    </head>
+    <body>
+        <button data-tag="login" id="btn">打开登录悬浮窗</button>
+        
+        <button data-tag="sendData" id="ajax">发送请求</button>
+        
+        <script>
+            //未使用AOP
+//            var showLogin = function() {
+//                console.log('打开登录悬浮窗');
+//                log(this.getAttribute('data-tag'));
+//            };
+//            
+//            var log = function(tag) {
+//                console.log('上报标签：' + tag);
+//            };
+//            
+//            $('#btn').on('click', function() {
+//                showLogin.call(this);
+//            });
+            
+            //使用AOP
+            var showLogin = function() {
+                console.log('打开登录悬浮窗');
+            };
+            
+            var log = function() {
+                console.log('上报标签：' + this.getAttribute('data-tag'));
+            };
+            
+            $('#btn').on('click', function() {
+                showLogin.after(log).call(this);
+            });
+            
+            //动态改变参数
+            var getToken = function() {
+                return 'zol';
+            };
+            $.ajax = $.ajax.before(function(param) {
+                var param = param || {};
+                
+                param.data = param.data || {};
+                param.data.token = getToken();
+            });
+            $('#ajax').on('click', function() {
+                $.ajax({
+                    type: 'get',
+                    dataType: 'json',
+                    url: 'test.php',
+                    data: {test: 'yes'},
+                    success: function(data) {
+                        console.log(data);
+                    }
+                });
+            });
+        </script>
+    </body>
+</html>
